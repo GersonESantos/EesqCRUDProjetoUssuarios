@@ -27,36 +27,17 @@ const pool = mysql.createPool({
         const connection = await pool.getConnection();
         console.log('✅ Base de dados conectada com sucesso!');
 
+        /* 
+        // Comentado para NÃO alterar a estrutura do banco existente
         const createTableQuery = `
             CREATE TABLE IF NOT EXISTS \`usuarios\` (
               \`id\` BIGINT NOT NULL AUTO_INCREMENT,
-              \`nome\` VARCHAR(100) NOT NULL,
-              \`email\` VARCHAR(150) NOT NULL,
-              \`telefone\` VARCHAR(15) NULL DEFAULT NULL,
-              \`documento\` VARCHAR(14) NULL DEFAULT NULL,
-              \`senha\` VARCHAR(255) NOT NULL,
-              \`sexo\` VARCHAR(20) NULL DEFAULT NULL,
-              \`data_nasc\` DATE NULL DEFAULT NULL,
-              \`endereco\` VARCHAR(255) NULL DEFAULT NULL,
-              \`cidade\` VARCHAR(100) NULL DEFAULT NULL,
-              \`estado\` VARCHAR(2) NULL DEFAULT NULL,
-              \`status\` VARCHAR(50) NOT NULL DEFAULT 'Ativo',
-              \`tipo_usuario\` VARCHAR(50) NOT NULL DEFAULT 'Cliente',
-              \`data_cadastro\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              \`newsletter\` TINYINT(1) NOT NULL DEFAULT '1',
-              \`notificacoes_push\` TINYINT(1) NOT NULL DEFAULT '1',
-              \`idioma\` VARCHAR(10) NOT NULL DEFAULT 'pt-BR',
-              \`nivel_experiencia\` VARCHAR(50) NULL DEFAULT NULL,
-              PRIMARY KEY (\`id\`),
-              UNIQUE INDEX \`email\` (\`email\` ASC) VISIBLE,
-              UNIQUE INDEX \`documento\` (\`documento\` ASC) VISIBLE)
-            ENGINE = InnoDB
-            DEFAULT CHARACTER SET = utf8mb4
-            COLLATE = utf8mb4_0900_ai_ci;
+              ... (mantendo estrutura original)
         `;
-
         await connection.query(createTableQuery);
-        console.log('✅ Tabela usuarios verificada/criada.');
+        console.log('✅ Tabela usuarios verificada (criação ignorada).');
+        */
+        console.log('✅ Conexão estabelecida (Usando estrutura existente).');
         connection.release();
     } catch (err) {
         console.error('❌ Erro ao conectar ao banco de dados:', err);
@@ -90,9 +71,10 @@ app.post('/submit', async (req, res) => {
     } catch (error) {
         console.error('Erro ao salvar dados:', error);
         if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ error: 'Email já cadastrado.' });
+            return res.status(409).json({ error: 'Email ou Documento já cadastrado.' });
         }
-        res.status(500).json({ error: 'Erro interno do servidor.' });
+        // Send detailed error for debugging
+        res.status(500).json({ error: `Erro no servidor: ${error.message || error.code}` });
     }
 });
 
